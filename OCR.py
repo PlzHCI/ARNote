@@ -2,8 +2,6 @@ from google.cloud import vision
 import os
 import time
 
-# TODO: add object detection?
-
 
 def detect_text(path: str, api_key: str) -> str:
     """Detects text in the file and returns the extracted text."""

@@ -1,6 +1,7 @@
 from google.cloud import vision
 import os
 import time
+import json
 
 
 def detect_text(path: str, api_key: str) -> str:
@@ -40,27 +41,56 @@ def detect_text(path: str, api_key: str) -> str:
 
 def process_directory(directory: str, api_key: str) -> dict:
     """Process all images in a directory and return a dictionary of results."""
-    # TODO: OCR if new file is detected, delete the OCRed file
     results = {}
     total_time = 0
+    processed_files_path = os.path.join(directory, 'processed_files.json')
+
+    # Load the list of previously processed files
+    if os.path.exists(processed_files_path):
+        with open(processed_files_path, 'r') as f:
+            processed_files = json.load(f)
+    else:
+        processed_files = {}
+
     for filename in os.listdir(directory):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):
             file_path = os.path.join(directory, filename)
-            try:
-                start_time = time.time()
-                text = detect_text(file_path, api_key)
-                end_time = time.time()
-                process_time = end_time - start_time
-                total_time += process_time
-                results[filename] = {
-                    'text': text,
-                    'process_time': process_time
-                }
-            except Exception as e:
-                results[filename] = {
-                    'text': f"Error: {str(e)}",
-                    'process_time': 0
-                }
+            file_mtime = os.path.getmtime(file_path)
+
+            # Check if the file is new or modified
+            if filename not in processed_files or file_mtime > processed_files[filename]:
+                try:
+                    start_time = time.time()
+                    text = detect_text(file_path, api_key)
+                    end_time = time.time()
+                    process_time = end_time - start_time
+                    total_time += process_time
+                    results[filename] = {
+                        'text': text,
+                        'process_time': process_time
+                    }
+                    # Update the processed files list
+                    processed_files[filename] = file_mtime
+                except Exception as e:
+                    results[filename] = {
+                        'text': f"Error: {str(e)}",
+                        'process_time': 0
+                    }
+            else:
+                # File has been processed before, skip it
+                pass
+                # print(f"Skipping already processed file: {filename}")
+
+    # Save the updated list of processed files
+    with open(processed_files_path, 'w') as f:
+        json.dump(processed_files, f)
+
+    # Delete OCRed files that are no longer in the directory
+    for processed_file in list(processed_files.keys()):
+        if processed_file not in os.listdir(directory):
+            del processed_files[processed_file]
+            print(f"Removed tracking for deleted file: {processed_file}")
+
     return results, total_time
 
 
@@ -69,6 +99,9 @@ def inference(image_directory: str, api_key: str) -> str:
     Process all images in a directory and return a string with all detected results.
     """
     results, total_process_time = process_directory(image_directory, api_key)
+
+    if not results:
+        return None
 
     output = []
     for filename, data in results.items():
@@ -84,8 +117,7 @@ def inference(image_directory: str, api_key: str) -> str:
 
 def main():
     # Get the API key from an environment variable
-    # os.environ.get('GOOGLE_CLOUD_API_KEY')
-    api_key = "AIzaSyD_HTxDrvB0L4r5c2OF80XRRehMTJ0ab9w"  # TODO: change to env variable
+    api_key = os.environ.get('GOOGLE_CLOUD_API_KEY')
     if not api_key:
         print("Error: GOOGLE_CLOUD_API_KEY not set.")
         return
@@ -93,10 +125,22 @@ def main():
     # Specify the directory containing the images
     image_directory = 'images'
 
-    # Use the inference function
-    result_string = inference(image_directory, api_key)
-    print(result_string)
+    print("Monitoring directory for new images. Press Ctrl+C to stop.")
 
+    try:
+        while True:
+            # Use the inference function
+            result_string = inference(image_directory, api_key)
+            if result_string:
+                print("\nNew or modified files detected:")
+                print(result_string)
+            else:
+                print(".", end="", flush=True)  # Progress indicator
+
+            time.sleep(1)  # Wait for 1 second before checking again
+
+    except KeyboardInterrupt:
+        print("\nMonitoring stopped.")
 
 if __name__ == "__main__":
     main()

@@ -22,3 +22,6 @@ __pycache__/
 # Ignore IDE specific files
 .vscode/
 .idea/
+
+# Ignore processed_files.json
+processed_files.json

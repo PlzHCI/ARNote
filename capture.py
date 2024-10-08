@@ -22,7 +22,7 @@ time.sleep(1)
 sio = socketio.Client()
 
 # Connect to the server on port 3000
-sio.connect('http://localhost:3000/')
+sio.connect('http://10.131.100.68:3000/')
 
 # Define a handler for a specific event, e.g., 'screenshot'
 @sio.on('screenshot')

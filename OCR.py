@@ -107,10 +107,7 @@ def inference(image_directory: str, api_key: str) -> str:
     for filename, data in results.items():
         output.append(f"File: {filename}")
         output.append(f"Extracted text:\n{data['text']}")
-        output.append(f"Process time: {data['process_time']:.2f} seconds")
-        output.append("-" * 50)
 
-    output.append(f"Total OCR process time: {total_process_time:.2f} seconds")
 
     return "\n".join(output)
 
@@ -133,7 +130,9 @@ def main():
             result_string = inference(image_directory, api_key)
             if result_string:
                 print("\nNew or modified files detected:")
-                print(result_string)
+                with open('ocr_results.txt', 'w') as f:
+                    f.write(result_string)
+                print(f"Results written to ocr_results.txt")
             else:
                 print(".", end="", flush=True)  # Progress indicator
 

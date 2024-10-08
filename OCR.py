@@ -2,6 +2,7 @@ from google.cloud import vision
 import os
 import time
 import json
+import datetime
 
 
 def detect_text(path: str, api_key: str) -> str:
@@ -107,7 +108,7 @@ def inference(image_directory: str, api_key: str) -> str:
     for filename, data in results.items():
         output.append(f"File: {filename}")
         output.append(f"Extracted text:\n{data['text']}")
-
+        output.append("-" * 50)  # Add a separator between files
 
     return "\n".join(output)
 
@@ -130,9 +131,18 @@ def main():
             result_string = inference(image_directory, api_key)
             if result_string:
                 print("\nNew or modified files detected:")
-                with open('ocr_results.txt', 'w') as f:
+
+                # Write to single_result.txt
+                with open('single_result.txt', 'w') as f:
                     f.write(result_string)
-                print(f"Results written to ocr_results.txt")
+                print(f"Current results written to single_result.txt")
+
+                # Append to all_results.txt with timestamp
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                with open('all_results.txt', 'a') as f:
+                    f.write(f"\n\n--- Results from {timestamp} ---\n\n")
+                    f.write(result_string)
+                print(f"Results appended to all_results.txt")
             else:
                 print(".", end="", flush=True)  # Progress indicator
 

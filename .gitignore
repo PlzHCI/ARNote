@@ -25,3 +25,6 @@ __pycache__/
 
 # Ignore processed_files.json
 processed_files.json
+
+# Ignore some files in server folder
+server/node_modules/

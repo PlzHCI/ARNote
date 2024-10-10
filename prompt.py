@@ -35,13 +35,6 @@ def main():
     print("Currently reading all_results.txt and engaging in brainstorming...")
     content = read_all_results()
     result = process_input(content)
-    print("\nResults of the brainstorming session:")
-    print(result)
-
-    # Save the result to a text file
-    with open('results.txt', 'w', encoding='utf-8') as output_file:
-        output_file.write(result)  # Write the result to the file
-        print("Results saved to 'results.txt'.")
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@ import os
 import time
 import json
 import datetime
+from prompt import process_input  # Import the process_input function
 
 
 def detect_text(path: str, api_key: str) -> str:
@@ -143,6 +144,12 @@ def main():
                     f.write(f"\n\n--- Results from {timestamp} ---\n\n")
                     f.write(result_string)
                 print(f"Results appended to all_results.txt")
+
+                # Send result_string to prompt.py for processing
+                brainstorming_result = process_input(result_string)
+                print("\nBrainstorming results:")
+                print(brainstorming_result)
+
             else:
                 print(".", end="", flush=True)  # Progress indicator
 

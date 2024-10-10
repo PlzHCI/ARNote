@@ -55,7 +55,7 @@ def on_ideation(data):
     # Call the process_input function with the response
     result = process_input(response)  # Process the input
     print(f"Ideation result below:\n{result}")
-    sio.emit('result', {'ideation result': result})
+    sio.emit('result', result)
 
 # Keep the session running until manually stopped
 try:

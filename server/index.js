@@ -35,7 +35,9 @@ io.on("connection", (socket) => {
 	});
 	socket.on("result", (data) => {
 		console.log("Received ideation result with data:", data);
-		socket.broadcast.emit("result", data);
+		const stringData = JSON.stringify(data);
+		socket.broadcast.emit("result", stringData);
+		console.log("stringData", stringData);
 	});
 });
 

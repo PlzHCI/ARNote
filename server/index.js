@@ -29,6 +29,14 @@ io.on("connection", (socket) => {
 		console.log("Received screenshot event with data:", data);
 		socket.broadcast.emit("screenshot", data);
 	});
+	socket.on("ideation", (data) => {
+		console.log("Received generate ideation event with data:", data);
+		socket.broadcast.emit("ideation", data);
+	});
+	socket.on("result", (data) => {
+		console.log("Received ideation result with data:", data);
+		socket.broadcast.emit("result", data);
+	});
 });
 
 server.listen(3000, () => {

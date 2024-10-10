@@ -1,3 +1,5 @@
+# Author: Xianhao
+import os
 import socketio
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -7,6 +9,9 @@ import numpy as np
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 # Initialize Selenium WebDriver
+
+from prompt import process_input  # Import the process_input function
+from ocr import inference_single_image  # Import the process_single_image function
 
 service = Service('./chromedriver')
 driver = webdriver.Chrome(service=service)
@@ -34,6 +39,23 @@ def on_screenshot(data):
     # Take a screenshot and save it
     driver.save_screenshot(screenshot_filename)
     print(f"Screenshot taken and saved as '{screenshot_filename}'")
+    # execute OCR detection and append to single_result.txt
+    inference_result = inference_single_image(screenshot_filename, os.environ.get('GOOGLE_CLOUD_API_KEY'))
+    print(f"OCR result: {inference_result}")
+    
+    
+    
+@sio.on('ideation')
+def on_ideation(data):
+    # Read the contents of single_result.txt
+    print("Received 'require ideation' event with data:", data)
+    with open('single_result.txt', 'r') as file:
+        response = file.read()  # Save the data into response variable
+    
+    # Call the process_input function with the response
+    result = process_input(response)  # Process the input
+    print(f"Ideation result below:\n{result}")
+    sio.emit('result', {'ideation result': result})
 
 # Keep the session running until manually stopped
 try:
@@ -45,10 +67,6 @@ try:
             # Take a screenshot and save it
             driver.save_screenshot('images/screenshot.png')
             print("Screenshot taken and saved as 'screenshot.png'")
-        elif user_input.lower() == 'e':
-            # Broadcast the 'screenshot' event
-            sio.emit('screenshot', {'message': 'Broadcasting screenshot event'})
-            print("Broadcasted 'screenshot' event")
         else:
             print("Invalid input. Please try again.")
 finally:

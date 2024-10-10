@@ -7,7 +7,7 @@ topic = "How to build a good collaboration team?"
 
 def read_all_results():
     try:
-        with open('all_results.txt', 'r', encoding='utf-8') as file:
+        with open('single_result.txt', 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
         return "File 'all_results.txt' not found."

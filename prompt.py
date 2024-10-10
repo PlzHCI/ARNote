@@ -1,8 +1,9 @@
 import openai
 import os
 
-# 设置OpenAI API密钥
+# set up OpenAI API key
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+topic = "How to build a good collaboration team?"
 
 def read_all_results():
     try:
@@ -12,13 +13,14 @@ def read_all_results():
         return "File 'all_results.txt' not found."
 
 def process_input(content):
-    prompt = f"Please brainstorm based on the contents of the following documents:\n\n{content}\n\nCould you kindly provide some creative ideas?"
+    prompt = f"Please brainstorm based on the contents of the following documents:\n\n{content}\n\nCould you kindly provide some creative ideas? Keep every single idea less than 6 words.\
+        No explanation is needed for each idea. At most 5 ideas are needed."
 
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a creative assistant, skilled in brainstorming."},
+                {"role": "system", "content": f"You are a creative assistant, skilled in brainstorming. The brainstorming topic is {topic}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -35,6 +37,11 @@ def main():
     result = process_input(content)
     print("\nResults of the brainstorming session:")
     print(result)
+
+    # Save the result to a text file
+    with open('results.txt', 'w', encoding='utf-8') as output_file:
+        output_file.write(result)  # Write the result to the file
+        print("Results saved to 'results.txt'.")
 
 if __name__ == "__main__":
     main()

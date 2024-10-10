@@ -28,9 +28,12 @@ sio.connect('http://10.131.100.68:3000/')
 @sio.on('screenshot')
 def on_screenshot(data):
     print("Received 'screenshot' event with data:", data)
+    # Generate a unique filename based on the current time
+    timestamp = int(time.time())
+    screenshot_filename = f'images/screenshot_{timestamp}.png'
     # Take a screenshot and save it
-    driver.save_screenshot('images/screenshot.png')
-    print("Screenshot taken and saved as 'screenshot.png'")
+    driver.save_screenshot(screenshot_filename)
+    print(f"Screenshot taken and saved as '{screenshot_filename}'")
 
 # Keep the session running until manually stopped
 try:

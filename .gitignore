@@ -28,3 +28,6 @@ processed_files.json
 
 # Ignore some files in server folder
 server/node_modules/
+
+# Ignore the entire images directory
+images/

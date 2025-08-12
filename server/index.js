@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5173;
 // create instance of the socket io server
 const io = new Server(server, {
 	cors: {
-		origin: `http://10.131.100.68:${PORT}`,
+		origin: `ws://localhost:${PORT}`,
 		credentials: true,
 		methods: ["GET", "POST"],
 	},
